@@ -1,12 +1,15 @@
-server: 
-  port: 8080
+app:
+  redis-keyspace: default
+
+server:
+  port: 8010
 
 spring:
   redis:
     cluster:
       nodes:
-        - 10.1.0.5:6379
-        - 10.1.0.6:6379
-        - 10.1.0.7:6379
+        - 192.168.0.106:6310
+        - 192.168.0.106:6320
+        - 192.168.0.106:6330
       maxRedirects: 2
     connect-timeout: 5000

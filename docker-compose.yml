@@ -2,15 +2,39 @@ version: "3.9"
 
 services:
 
-  redis_service:
-    container_name: redis_service
+  redis_service_cluster_default:
+    container_name: redis_service_cluster_default
     build:
       context: ./
     restart: unless-stopped
+    depends_on:
+      - redis_cluster_configurer
     ports:
-      - "8080:8080"
-    networks:
-      - default
+      - 8010:8010
+
+  redis_service_cluster_prod:
+    container_name: redis_service_cluster_prod
+    build:
+      context: ./
+    restart: unless-stopped
+    depends_on:
+      - redis_cluster_configurer
+    environment:
+      - "SPRING_PROFILES_ACTIVE=prod"
+    ports:
+      - 8011:8011
+
+  redis_service_cluster_test:
+    container_name: redis_service_cluster_test
+    build:
+      context: ./
+    restart: unless-stopped
+    depends_on:
+      - redis_cluster_configurer
+    environment:
+      - "SPRING_PROFILES_ACTIVE=test"
+    ports:
+      - 8012:8012
 
   redis_1:
     container_name: redis_1
@@ -18,11 +42,10 @@ services:
     restart: unless-stopped
     entrypoint: redis-server /redis_config/node_1.conf
     ports:
-      - 4100:6379
+      - 6310:6310
+      - 16310:16310
     volumes:
       - ./redis_config:/redis_config
-    networks:
-      - default
 
   redis_1_replica:
     container_name: redis_1_replica
@@ -30,11 +53,10 @@ services:
     restart: unless-stopped
     entrypoint: redis-server /redis_config/node_1_replica.conf
     ports:
-      - 4101:6379
+      - 6311:6311
+      - 16311:16311
     volumes:
       - ./redis_config:/redis_config
-    networks:
-      - default
 
   redis_2:
     container_name: redis_2
@@ -42,11 +64,10 @@ services:
     restart: unless-stopped
     entrypoint: redis-server /redis_config/node_2.conf
     ports:
-      - 4200:6379
+      - 6320:6320
+      - 16320:16320
     volumes:
       - ./redis_config:/redis_config
-    networks:
-      - default
 
   redis_2_replica:
     container_name: redis_2_replica
@@ -54,11 +75,10 @@ services:
     restart: unless-stopped
     entrypoint: redis-server /redis_config/node_2_replica.conf
     ports:
-      - 4201:6379
+      - 6321:6321
+      - 16321:16321
     volumes:
       - ./redis_config:/redis_config
-    networks:
-      - default
 
   redis_3:
     container_name: redis_3
@@ -66,11 +86,10 @@ services:
     restart: unless-stopped
     entrypoint: redis-server /redis_config/node_3.conf
     ports:
-      - 4300:6379
+      - 6330:6330
+      - 16330:16330
     volumes:
       - ./redis_config:/redis_config
-    networks:
-      - default
 
   redis_3_replica:
     container_name: redis_3_replica
@@ -78,16 +97,19 @@ services:
     restart: unless-stopped
     entrypoint: redis-server /redis_config/node_3_replica.conf
     ports:
-      - 4301:6379
+      - 6331:6331
+      - 16331:16331
     volumes:
       - ./redis_config:/redis_config
-    networks:
-      - default
 
-networks:
-  default:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 10.1.0.0/24
+  redis_cluster_configurer:
+    container_name: redis_cluster_configurer
+    image: redis:latest
+    depends_on:
+      - redis_1
+      - redis_2
+      - redis_3
+      - redis_1_replica
+      - redis_2_replica
+      - redis_3_replica
+    entrypoint: redis-cli --cluster create 192.168.0.106:6310 192.168.0.106:6320 192.168.0.106:6330 192.168.0.106:6311 192.168.0.106:6321 192.168.0.106:6331 --cluster-yes --cluster-replicas 1
