@@ -1,0 +1,93 @@
+version: "3.9"
+
+services:
+
+  redis_service:
+    container_name: redis_service
+    build:
+      context: ./
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    networks:
+      - default
+
+  redis_1:
+    container_name: redis_1
+    image: redis:latest
+    restart: unless-stopped
+    entrypoint: redis-server /redis_config/node_1.conf
+    ports:
+      - 4100:6379
+    volumes:
+      - ./redis_config:/redis_config
+    networks:
+      - default
+
+  redis_1_replica:
+    container_name: redis_1_replica
+    image: redis:latest
+    restart: unless-stopped
+    entrypoint: redis-server /redis_config/node_1_replica.conf
+    ports:
+      - 4101:6379
+    volumes:
+      - ./redis_config:/redis_config
+    networks:
+      - default
+
+  redis_2:
+    container_name: redis_2
+    image: redis:latest
+    restart: unless-stopped
+    entrypoint: redis-server /redis_config/node_2.conf
+    ports:
+      - 4200:6379
+    volumes:
+      - ./redis_config:/redis_config
+    networks:
+      - default
+
+  redis_2_replica:
+    container_name: redis_2_replica
+    image: redis:latest
+    restart: unless-stopped
+    entrypoint: redis-server /redis_config/node_2_replica.conf
+    ports:
+      - 4201:6379
+    volumes:
+      - ./redis_config:/redis_config
+    networks:
+      - default
+
+  redis_3:
+    container_name: redis_3
+    image: redis:latest
+    restart: unless-stopped
+    entrypoint: redis-server /redis_config/node_3.conf
+    ports:
+      - 4300:6379
+    volumes:
+      - ./redis_config:/redis_config
+    networks:
+      - default
+
+  redis_3_replica:
+    container_name: redis_3_replica
+    image: redis:latest
+    restart: unless-stopped
+    entrypoint: redis-server /redis_config/node_3_replica.conf
+    ports:
+      - 4301:6379
+    volumes:
+      - ./redis_config:/redis_config
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.1.0.0/24

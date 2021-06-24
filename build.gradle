@@ -1,0 +1,23 @@
+plugins {
+    id "application"
+    id "org.springframework.boot" version "$springBootVersion"
+    id "io.spring.dependency-management" version "1.0.11.RELEASE"
+    id "io.freefair.lombok" version "${lombokPluginVersion}"
+}
+
+group "co.altir"
+version "1.0-SNAPSHOT"
+applicationDefaultJvmArgs = ["-Dspring.output.ansi.enabled=ALWAYS"]
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly("org.mapstruct:mapstruct:$mapstructVersion")
+    annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
+
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
+}
